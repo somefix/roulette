@@ -6,10 +6,12 @@ const button = document.querySelector('button');
 const context = canvas.getContext('2d');
 
 const CLIENT_WIDTH = body.clientWidth;
+const IMAGE_GAP = 8;
 const IMAGE_WIDTH = 151;
 const IMAGE_HEIGHT = 151;
 const IMAGE_COUNT = Math.ceil(CLIENT_WIDTH/IMAGE_WIDTH);
 const IMAGES_PADDING = 22;
+const CENTER_DELAY = ((IMAGE_COUNT * (IMAGE_WIDTH + IMAGE_GAP) - IMAGE_GAP) - CLIENT_WIDTH)/2
 const OFFSET = 1;
 const BASE_SPEED = 5;
 const ACCELERATION_DURATION_MIN = 500;
@@ -25,11 +27,11 @@ const STATE = {
 
 const images = [];
 const imageUrls = [
-	'./public/Rectangle 94.png',
-	'./public/Rectangle 94.png',
-	'./public/Rectangle 94.png',
-	'./public/Rectangle 94.png',
-	'./public/Rectangle 94.png',
+	'./public/Rectangle1.png',
+	'./public/Rectangle2.png',
+	'./public/Rectangle3.png',
+	'./public/Rectangle4.png',
+	'./public/Rectangle5.png',
 ];
 let speed = 0;
 let state = STATE.RETURN;
@@ -46,29 +48,38 @@ const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 
 const draw = () => {
 	const imagesLength = images.length;
-	const center = Math.floor(canvas.width / 2)
 
-	context.fillStyle = '#0954154D';
+	context.fillStyle = 'rgba(9, 84, 21, 0.3)';
+	context.clearRect(0, 0, canvas.width, canvas.height);
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
 	for (let index = -OFFSET; index < IMAGE_COUNT + OFFSET; index++) {
 		const imageIndex = index < 0 ? index + imagesLength : index;
 		const image = images[(imageIndex + startIndex) % imagesLength];
+
 		context.drawImage(
 			image,
-			IMAGE_WIDTH * index - offset,
-			0,
+			(IMAGE_WIDTH + IMAGE_GAP) * index - CENTER_DELAY - offset,
+			IMAGES_PADDING,
 			IMAGE_WIDTH,
 			IMAGE_HEIGHT
 		);
 	}
 
-	context.moveTo(center + 0.5, 0);
-	context.lineTo(center + 0.5, canvas.height);
-	context.closePath();
-	context.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-	context.stroke();
+	drawSeparator();
 };
+
+function drawSeparator() {
+	const center = Math.floor(canvas.width / 2)
+
+	context.beginPath();
+	context.moveTo(center - 2, 0);
+	context.lineTo(center - 2, canvas.height);
+	context.closePath();
+	context.strokeStyle = 'white';
+	context.lineWidth = 4;
+	context.stroke();
+}
 
 const update = () => {
 	const imagesLength = images.length;
@@ -114,14 +125,30 @@ const update = () => {
 	} else {
 		const winner = (index + startIndex) % imagesLength;
 
-		context.fillStyle = 'rgba(255, 0, 255, 0.2)';
-		context.fillRect(index * IMAGE_WIDTH - offset, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+		drawRoundedRect((IMAGE_WIDTH + IMAGE_GAP) * index - CENTER_DELAY - offset, IMAGES_PADDING, IMAGE_WIDTH, IMAGE_HEIGHT, 20, 'rgba(255, 0, 255, 0.2)');
+		drawSeparator();
 		console.group('Winner');
 		console.log('Index', winner);
 		console.log('Image', imageUrls[winner]);
 		console.groupEnd();
 	}
 };
+
+function drawRoundedRect(x, y, width, height, radius, fillStyle) {
+	context.beginPath();
+	context.moveTo(x + radius, y);
+	context.lineTo(x + width - radius, y);
+	context.arcTo(x + width, y, x + width, y + height, radius);
+	context.lineTo(x + width, y + height - radius);
+	context.arcTo(x + width, y + height, x, y + height, radius);
+	context.lineTo(x + radius, y + height);
+	context.arcTo(x, y + height, x, y, radius);
+	context.lineTo(x, y + radius);
+	context.arcTo(x, y, x + radius, y, radius);
+	context.closePath();
+	context.fillStyle = fillStyle; // Цвет заливки
+	context.fill(); // Заполнение фигуры
+}
 
 const init = async () => {
 	[canvas.width, canvas.height] = [CLIENT_WIDTH, IMAGE_HEIGHT + IMAGES_PADDING * 2];
