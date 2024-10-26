@@ -1,8 +1,13 @@
 import './style.css'
+import image1 from './public/Rectangle1.png';
+import image2 from './public/Rectangle2.png';
+import image3 from './public/Rectangle3.png';
+import image4 from './public/Rectangle4.png';
+import image5 from './public/Rectangle5.png';
 
 const body = document.querySelector('body');
 const canvas = document.querySelector('canvas');
-const button = document.querySelector('button');
+const button = document.querySelector('button') ?? document.querySelector('.button');
 const context = canvas.getContext('2d');
 
 const CLIENT_WIDTH = body.clientWidth;
@@ -27,11 +32,11 @@ const STATE = {
 
 const images = [];
 const imageUrls = [
-	'./public/Rectangle1.png',
-	'./public/Rectangle2.png',
-	'./public/Rectangle3.png',
-	'./public/Rectangle4.png',
-	'./public/Rectangle5.png',
+	image1,
+	image2,
+	image3,
+	image4,
+	image5,
 ];
 let speed = 0;
 let state = STATE.RETURN;
